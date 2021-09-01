@@ -25,6 +25,8 @@ export const mixin = {
   },
 };
 
+// TODO:
+// 这里基于 createBaseForm 实现，附带包装了一些参数
 function createForm(options) {
   return createBaseForm(options, [mixin]);
 }
