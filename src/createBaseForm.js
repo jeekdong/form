@@ -42,6 +42,10 @@ function createBaseForm(option = {}, mixins = []) {
     withRef,
   } = option;
 
+  // TODO: 
+  // 这里返回了一个函数，这个函数的参数就是我们的业务组件
+  // 因此可以说 createBaseForm 是一个高阶组件
+  // 它会给我们的组件注入 form 的props
   return function decorate(WrappedComponent) {
     const Form = createReactClass({
       mixins,
@@ -180,12 +184,16 @@ function createBaseForm(option = {}, mixins = []) {
         return cache[action].fn;
       },
 
+      // TODO:
+      // 处理表单组件双向数据绑定的核心处
       getFieldDecorator(name, fieldOption) {
         const props = this.getFieldProps(name, fieldOption);
         return fieldElem => {
           // We should put field in record if it is rendered
           this.renderFields[name] = true;
 
+          // 从 fieldsStore 拿到这个表单的相关配置信息
+          // fieldsStore 中包含了当前 form 的主要信息和一些处理表单数据的方法。
           const fieldMeta = this.fieldsStore.getFieldMeta(name);
           const originalProps = fieldElem.props;
           if (process.env.NODE_ENV !== 'production') {
@@ -212,6 +220,7 @@ function createBaseForm(option = {}, mixins = []) {
             ...props,
             ...this.fieldsStore.getFieldValuePropValue(fieldMeta),
           });
+          // 一些兼容处理，supportRef？
           return supportRef(fieldElem) ? (
             decoratedFieldElem
           ) : (
@@ -239,6 +248,7 @@ function createBaseForm(option = {}, mixins = []) {
 
         delete this.clearedFieldMetaCache[name];
 
+        // 组装 props
         const fieldOption = {
           name,
           trigger: DEFAULT_TRIGGER,
@@ -259,6 +269,7 @@ function createBaseForm(option = {}, mixins = []) {
           fieldMeta.initialValue = fieldOption.initialValue;
         }
 
+        // 组装 inputProps
         const inputProps = {
           ...this.fieldsStore.getFieldValuePropValue(fieldOption),
           ref: this.getCacheBind(name, `${name}__ref`, this.saveRef),
